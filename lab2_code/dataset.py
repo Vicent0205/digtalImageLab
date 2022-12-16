@@ -3,12 +3,13 @@ import os
 import PIL.Image as Image
 from torchvision.transforms import transforms as T
 import rasterio
+from rasterio.windows import Window
 #data.Dataset:
 #所有子类应该override__len__和__getitem__，前者提供了数据集的大小，后者支持整数索引，范围从0到len(self)
  
 class LiverDataset(data.Dataset):
     #创建LiverDataset类的实例时，就是在调用init初始化
-    def __init__(self,root1,fileType1,root1_1,fileType1_1,root2,fileType2,root2_1,fileType2_1,transform = None,target_transform = None):#root表示图片路径
+    def __init__(self,root1=None,fileType1=None,root1_1=None,fileType1_1=None,root2=None,fileType2=None,root2_1=None,fileType2_1=None,transform = None,target_transform = None):#root表示图片路径
         #n = len(os.listdir(root1))#os.listdir(path)返回指定路径下的文件和文件夹列表。/是真除法,//对结果取整
         #m=len(os.listdir(root2))
         imgs = []
@@ -111,15 +112,25 @@ class LiverDataset(data.Dataset):
         if x_path[len(x_path)-3:]=='tif':
             isTif1=True
             img_x = rasterio.open(x_path)
-            img_x=img_x.read()
+            
+            img_x=img_x.read([1,2,3],window=Window(0,0,560,576))
+            print("check before")
+            print(img_x.shape)
         else:
             img_x = Image.open(x_path)
+            
+            #img_x=img_x.resize((576,560))
+
         if y_path[len(y_path)-3:]=='tif':
             isTif2=True
             img_y = rasterio.open(y_path)
             img_y=img_y.read()
+            
         else:
             img_y=Image.open(y_path)
+            print("y_img  before")
+            print(img_y.size)
+            img_y=img_y.resize((560,576))
         
 
         
@@ -130,9 +141,14 @@ class LiverDataset(data.Dataset):
                 print("x shape")
                 print(img_x.shape)
             else:
+                print()
                 img_x=T.ToTensor()(img_x)
-                img_x=img_x.reshape((3,584,565))
+                print("x shape else ")
+                print(img_x.shape)
+                img_x=img_x.reshape((3,576,560))
                 img_x=T.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])(img_x)
+            print("img_x shape")
+            print(img_x.shape)
             #print(img_x)
         if self.target_transform is not None:
             print("process Y before")
@@ -148,6 +164,8 @@ class LiverDataset(data.Dataset):
                 print(img_y.shape)
             else:
                 img_y=self.target_transform(img_y)
+            print("img_y shape")
+            print(img_y.shape)
         return img_x,img_y#返回的是图片
     
     

@@ -32,6 +32,8 @@ def train_model(model,criterion,optimizer,dataload,num_epochs=20):
             inputs = x.to(device)
             labels = y.to(device)
             outputs = model(inputs)#前向传播
+            print(outputs)
+            outputs=torch.sigmoid(outputs)
             loss = criterion(outputs, labels)#计算损失
             loss.backward()#梯度下降,计算出梯度
             optimizer.step()#更新参数一次：所有的优化器Optimizer都实现了step()方法来对所有的参数进行更新
@@ -54,7 +56,9 @@ def train():
     #梯度下降
     optimizer = optim.Adam(model.parameters())#model.parameters():Returns an iterator over module parameters
     #加载数据集
-    liver_dataset = LiverDataset(root1="picData2/images",fileType1='jpg',root1_1="picData/training/images",fileType1_1='tif', root2="picData2/manual1", fileType2='tif', root2_1="picData/training/1st_manual",fileType2_1='gif', transform=x_transform, target_transform=y_transform)
+    #liver_dataset = LiverDataset(root1_1="picData2/images",fileType1_1='jpg',root1="picData/training/images",fileType1='tif', root2_1="picData2/manual1", fileType2_1='tif', root2="picData/training/1st_manual",fileType2='gif', transform=x_transform, target_transform=y_transform)
+    liver_dataset = LiverDataset(root1="picData/training/images",fileType1='tif', root2="picData/training/1st_manual",fileType2='gif', transform=x_transform, target_transform=y_transform)
+
     dataloader = DataLoader(liver_dataset, batch_size=batch_size, shuffle=True,num_workers=0)
     # DataLoader:该接口主要用来将自定义的数据读取接口的输出或者PyTorch已有的数据读取接口的输入按照batch size封装成Tensor
     # batch_size：how many samples per minibatch to load，这里为4，数据集大小400，所以一共有100个minibatch
