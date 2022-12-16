@@ -54,7 +54,7 @@ def train():
     #梯度下降
     optimizer = optim.Adam(model.parameters())#model.parameters():Returns an iterator over module parameters
     #加载数据集
-    liver_dataset = LiverDataset("picData2/images","picData2/manual1", transform=x_transform, target_transform=y_transform)
+    liver_dataset = LiverDataset(root1="picData2/images",fileType1='jpg',root1_1="picData/training/images",fileType1_1='tif', root2="picData2/manual1", fileType2='tif', root2_1="picData/training/1st_manual",fileType2_1='gif', transform=x_transform, target_transform=y_transform)
     dataloader = DataLoader(liver_dataset, batch_size=batch_size, shuffle=True,num_workers=0)
     # DataLoader:该接口主要用来将自定义的数据读取接口的输出或者PyTorch已有的数据读取接口的输入按照batch size封装成Tensor
     # batch_size：how many samples per minibatch to load，这里为4，数据集大小400，所以一共有100个minibatch
@@ -66,7 +66,7 @@ def train():
 def test():
     model = unet.UNet(3,1)
     model.load_state_dict(torch.load(args.weight,map_location='cpu'))
-    liver_dataset = LiverDataset("data/val", transform=x_transform, target_transform=y_transform)
+    liver_dataset = LiverDataset(root1="picData/test/images",fileType1='tif',root2="picData2/test/1st_manual" , fileType2='gif', transform=x_transform, target_transform=y_transform)
     dataloaders = DataLoader(liver_dataset)#batch_size默认为1
     model.eval()
     import matplotlib.pyplot as plt
